@@ -1,0 +1,138 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <h1>Sprint Planning</h1>
+        <p class="muted">
+            Build a sprint plan based on priority, dependencies, and team capacity.
+        </p>
+    </div>
+    <a href="{{ url_for('index') }}" class="button">
+        Back to Dashboard
+    </a>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h2>Plan Your Sprint</h2>
+        <p class="muted">
+            Set your team's available story points to generate a proposed sprint.
+        </p>
+
+        <form method="POST" action="{{ url_for('sprint') }}">
+            <div class="form-grid">
+                <div>
+                    <label for="capacity">Sprint capacity (story points)</label>
+                    <input
+                        type="number"
+                        id="capacity"
+                        name="capacity"
+                        min="1"
+                        max="1000"
+                        value="{{ request.form.get('capacity', 30) }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button">
+                    Generate Sprint Plan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Planning Overview</h2>
+        <p class="muted">
+            The planner considers priority scores, story points, completion
+            status, and prerequisite work.
+        </p>
+        <div class="metric-card">
+            <span class="muted">Backlog items available</span>
+            <h2>{{ items|length }}</h2>
+        </div>
+    </div>
+</div>
+
+{% if sprint_result %}
+<div class="card">
+    <h2>Proposed Sprint</h2>
+
+    <div class="grid">
+        <div class="metric-card">
+            <span class="muted">Planned points</span>
+            <h2>{{ sprint_result.total_points }}</h2>
+        </div>
+        <div class="metric-card">
+            <span class="muted">Sprint capacity</span>
+            <h2>{{ sprint_result.capacity }}</h2>
+        </div>
+        <div class="metric-card">
+            <span class="muted">Remaining capacity</span>
+            <h2>{{ sprint_result.remaining_capacity }}</h2>
+        </div>
+        <div class="metric-card">
+            <span class="muted">Combined priority score</span>
+            <h2>{{ sprint_result.total_priority_score }}</h2>
+        </div>
+    </div>
+
+    <h3>Selected Work Items</h3>
+
+    {% if sprint_result.stories %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Work Item</th>
+                    <th>Priority Score</th>
+                    <th>Story Points</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for story in sprint_result.stories %}
+                <tr>
+                    <td>{{ story.title }}</td>
+                    <td>{{ story.priority_score }}</td>
+                    <td>{{ story.story_points }}</td>
+                    <td>{{ story.state }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">
+        No work items fit this sprint. Check your backlog and capacity.
+    </p>
+    {% endif %}
+</div>
+
+{% if sprint_risk %}
+<div class="card">
+    <h2>Sprint Risk Assessment</h2>
+    <p>
+        Risk level:
+        <strong>{{ sprint_risk.risk_level }}</strong>
+        ({{ sprint_risk.risk_score }}/100)
+    </p>
+    <p>
+        Capacity utilization:
+        {{ sprint_risk.utilization_percent }}%
+    </p>
+
+    <h3>Risk indicators</h3>
+    <ul>
+        {% for reason in sprint_risk.reasons %}
+        <li>{{ reason }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

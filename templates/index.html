@@ -1,0 +1,730 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard | BacklogVision{% endblock %}
+{% block header_title %}Workspace Overview{% endblock %}
+
+{% block content %}
+
+<style>
+    .welcome-banner {
+        position: relative;
+        overflow: hidden;
+        padding: 30px;
+        border-radius: 20px;
+        color: white;
+        background: linear-gradient(115deg, #27205f 0%, #5148d7 58%, #8275ff 100%);
+        margin-bottom: 24px;
+        box-shadow: 0 12px 30px #5148d728;
+    }
+
+    .welcome-banner:after {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        border: 1px solid #ffffff24;
+        border-radius: 50%;
+        right: -45px;
+        top: -125px;
+        box-shadow: 0 0 0 28px #ffffff09, 0 0 0 58px #ffffff07;
+    }
+
+    .welcome-banner h1 {
+        font-size: 28px;
+        margin: 0 0 10px;
+        color: white;
+    }
+
+    .welcome-banner p {
+        color: #e2e0ff;
+        max-width: 550px;
+        margin: 0;
+        font-size: 13px;
+    }
+
+    .welcome-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 23px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-actions .button {
+        background: white;
+        color: #4338ca;
+    }
+
+    .welcome-actions .button.outline {
+        background: #ffffff18;
+        border: 1px solid #ffffff55;
+        color: white;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+
+    .section-heading h2 {
+        font-size: 16px;
+        margin: 0 0 5px;
+    }
+
+    .section-heading p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .kpi-card {
+        padding: 20px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: white;
+        box-shadow: var(--shadow);
+    }
+
+    .kpi-label {
+        color: #78819a;
+        font-size: 12px;
+        font-weight: 650;
+    }
+
+    .kpi-value-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 13px;
+    }
+
+    .kpi-value {
+        font-size: 31px;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        font-weight: 800;
+        color: #202944;
+    }
+
+    .kpi-icon {
+        display: grid;
+        place-items: center;
+        width: 43px;
+        height: 43px;
+        border-radius: 13px;
+        font-size: 20px;
+    }
+
+    .kpi-foot {
+        font-size: 11px;
+        color: #9199ad;
+        margin-top: 11px;
+    }
+
+    .overview-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .premium-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 17px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+        min-width: 0;
+    }
+
+    .priority-row {
+        display: grid;
+        grid-template-columns: 105px minmax(60px, 1fr) 34px;
+        align-items: center;
+        gap: 12px;
+        margin: 21px 0;
+        font-size: 12px;
+    }
+
+    .priority-track {
+        height: 8px;
+        border-radius: 20px;
+        background: #eff0f7;
+        overflow: hidden;
+    }
+
+    .priority-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #8178ff, #5d53e9);
+    }
+
+    .priority-number {
+        font-weight: 800;
+        text-align: right;
+    }
+
+    .mini-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 0;
+        border-bottom: 1px solid #eef0f6;
+    }
+
+    .mini-stat:last-child {
+        border-bottom: none;
+    }
+
+    .mini-stat-label {
+        font-size: 12px;
+        color: #778099;
+    }
+
+    .mini-stat-value {
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .table-card {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .table-card-header {
+        padding: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .table-card .table-wrap {
+        padding: 0 10px;
+    }
+
+    .work-name {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        min-width: 175px;
+    }
+
+    .work-type-icon {
+        width: 35px;
+        height: 35px;
+        flex-shrink: 0;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: #efeeff;
+        color: #5d53e9;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .work-type-icon.bug {
+        background: #fff0f0;
+        color: #d9485a;
+    }
+
+    .work-type-icon.task {
+        background: #e6f7f1;
+        color: #138966;
+    }
+
+    .work-type-icon.feature {
+        background: #fff3df;
+        color: #c27b15;
+    }
+
+    .priority-cell {
+        min-width: 105px;
+    }
+
+    .priority-cell .progress {
+        margin-top: 7px;
+        height: 5px;
+    }
+
+    .sprint-panel {
+        margin-top: 24px;
+        padding: 25px;
+        border-radius: 17px;
+        background: linear-gradient(135deg, #f0efff, #fbfaff);
+        border: 1px solid #dedbff;
+    }
+
+    .sprint-panel h2 {
+        font-size: 18px;
+    }
+
+    .sprint-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 13px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .sprint-form .field {
+        width: 220px;
+        max-width: 100%;
+    }
+
+    .sprint-form label {
+        margin-top: 0;
+    }
+
+    .sprint-results {
+        margin-top: 22px;
+        background: white;
+        border-radius: 13px;
+        padding: 20px;
+    }
+
+    .empty-illustration {
+        width: 65px;
+        height: 65px;
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 18px;
+        font-size: 28px;
+        color: #5d53e9;
+        background: #efeeff;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 45px 18px;
+    }
+
+    @media (max-width: 1100px) {
+        .kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .overview-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .kpi-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .kpi-card {
+            padding: 15px;
+        }
+
+        .kpi-value {
+            font-size: 25px;
+        }
+
+        .kpi-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
+        }
+
+        .welcome-banner {
+            padding: 23px;
+        }
+
+        .welcome-banner h1 {
+            font-size: 23px;
+        }
+
+        .priority-row {
+            grid-template-columns: 92px minmax(40px, 1fr) 28px;
+            gap: 7px;
+        }
+    }
+</style>
+
+{% set total = items|length %}
+{% set active_count = items|selectattr('state', 'equalto', 'Active')|list|length %}
+{% set done_count = items|selectattr('state', 'equalto', 'Done')|list|length %}
+{% set blocked_count = items|selectattr('blocked', 'defined')|selectattr('blocked')|list|length %}
+{% set scored_items = items|selectattr('priority_score', 'defined')|list %}
+{% set high_count = scored_items|selectattr('priority_score', 'ge', 70)|list|length %}
+{% set medium_count = scored_items|selectattr('priority_score', 'ge', 40)|selectattr('priority_score', 'lt', 70)|list|length %}
+{% set low_count = scored_items|selectattr('priority_score', 'lt', 40)|list|length %}
+{% set configured = weights and weights|length == 5 and (weights.values()|sum - 100)|abs <= 0.01 %}
+
+<div class="welcome-banner">
+    <div style="position:relative;z-index:1">
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;margin-bottom:12px;color:#d3ceff">
+            AGILE WORKSPACE
+        </div>
+        <h1>Turn your backlog into a smarter plan.</h1>
+        <p>
+            Prioritize the right work, understand dependencies, and create
+            capacity-aware sprint plans with BacklogVision.
+        </p>
+        <div class="welcome-actions">
+            <a href="{{ url_for('add_story') }}" class="button">＋ Add Work Item</a>
+            <a href="{{ url_for('settings') }}" class="button outline">⚙ Configure Priorities</a>
+        </div>
+    </div>
+</div>
+
+{% if not configured %}
+<div class="flash warning">
+    <strong>Priority model not configured.</strong>
+    Configure all five weights and make sure they total 100% to calculate priority scores.
+    <a href="{{ url_for('settings') }}" style="font-weight:800;text-decoration:underline">Set up weights →</a>
+</div>
+{% endif %}
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">Total Backlog</div>
+        <div class="kpi-value-row">
+            <div class="kpi-value">{{ total }}</div>
+            <div class="kpi-icon" style="background:#efeeff;color:#625bf6">▤</div>
+        </div>
+        <div class="kpi-foot">All registered work items</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">In Progress</div>
+        <div class="kpi-value-row">
+            <div class="kpi-value">{{ active_count }}</div>
+            <div class="kpi-icon" style="background:#fff3df;color:#d58b21">◷</div>
+        </div>
+        <div class="kpi-foot">Items currently active</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">Completed</div>
+        <div class="kpi-value-row">
+            <div class="kpi-value">{{ done_count }}</div>
+            <div class="kpi-icon" style="background:#e4f8f0;color:#159b72">✓</div>
+        </div>
+        <div class="kpi-foot">
+            {% if total > 0 %}
+                {{ "%.0f"|format(done_count * 100 / total) }}% of all backlog items
+            {% else %}
+                Ready for your first item
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">Blocked Work</div>
+        <div class="kpi-value-row">
+            <div class="kpi-value">{{ blocked_count }}</div>
+            <div class="kpi-icon" style="background:#ffeaed;color:#dc5264">!</div>
+        </div>
+        <div class="kpi-foot">Items with unfinished prerequisites</div>
+    </div>
+</div>
+
+<div class="overview-grid">
+    <section class="premium-card">
+        <div class="section-heading">
+            <div>
+                <h2>Priority Distribution</h2>
+                <p>Distribution by calculated score bands</p>
+            </div>
+            <span class="badge primary">0–100 scale</span>
+        </div>
+
+        {% if configured and total > 0 %}
+            <div class="priority-row">
+                <span>High priority</span>
+                <div class="priority-track">
+                    <div class="priority-fill" style="width:{{ high_count * 100 / total }}%"></div>
+                </div>
+                <span class="priority-number">{{ high_count }}</span>
+            </div>
+
+            <div class="priority-row">
+                <span>Medium priority</span>
+                <div class="priority-track">
+                    <div class="priority-fill" style="width:{{ medium_count * 100 / total }}%;background:linear-gradient(90deg,#f6c56c,#e99a37)"></div>
+                </div>
+                <span class="priority-number">{{ medium_count }}</span>
+            </div>
+
+            <div class="priority-row">
+                <span>Low priority</span>
+                <div class="priority-track">
+                    <div class="priority-fill" style="width:{{ low_count * 100 / total }}%;background:linear-gradient(90deg,#64c8a6,#159b72)"></div>
+                </div>
+                <span class="priority-number">{{ low_count }}</span>
+            </div>
+
+            <p class="muted" style="font-size:11px;margin-top:22px">
+                High: 70–100 · Medium: 40–69.99 · Low: below 40.
+                These bands describe score ranges, not guaranteed delivery outcomes.
+            </p>
+        {% else %}
+            <div class="empty-state" style="padding:24px 10px">
+                <div class="empty-illustration">◎</div>
+                <h3>No priority distribution yet</h3>
+                <p class="muted">
+                    Add backlog items and configure your own priority weights
+                    to see how work is distributed.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="premium-card">
+        <div class="section-heading">
+            <div>
+                <h2>Workspace Health</h2>
+                <p>Current backlog status</p>
+            </div>
+            <span class="badge">Live summary</span>
+        </div>
+
+        <div class="mini-stat">
+            <span class="mini-stat-label">New items</span>
+            <span class="mini-stat-value">{{ items|selectattr('state', 'equalto', 'New')|list|length }}</span>
+        </div>
+
+        <div class="mini-stat">
+            <span class="mini-stat-label">Active items</span>
+            <span class="mini-stat-value">{{ active_count }}</span>
+        </div>
+
+        <div class="mini-stat">
+            <span class="mini-stat-label">Completed items</span>
+            <span class="mini-stat-value" style="color:#159b72">{{ done_count }}</span>
+        </div>
+
+        <div class="mini-stat">
+            <span class="mini-stat-label">Blocked items</span>
+            <span class="mini-stat-value" style="color:#dc5264">{{ blocked_count }}</span>
+        </div>
+
+        <div style="margin-top:18px">
+            <a href="{{ url_for('settings') }}" class="button secondary" style="width:100%">
+                Review Priority Model →
+            </a>
+        </div>
+    </section>
+</div>
+
+<section class="premium-card table-card">
+    <div class="table-card-header">
+        <div>
+            <h2 style="margin-bottom:5px">Product Backlog</h2>
+            <p class="muted" style="margin:0;font-size:12px">
+                Review priority, delivery status, and dependencies.
+            </p>
+        </div>
+        <div class="actions">
+            <span class="badge primary">{{ total }} items</span>
+            <a href="{{ url_for('add_story') }}" class="button">＋ New Item</a>
+        </div>
+    </div>
+
+    {% if items %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Work Item</th>
+                    <th>Status</th>
+                    <th>Priority Score</th>
+                    <th>Points</th>
+                    <th>Dependency</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div class="work-name">
+                            <div class="work-type-icon {% if item.work_item_type == 'Bug' %}bug{% elif item.work_item_type == 'Task' %}task{% elif item.work_item_type == 'Feature' %}feature{% endif %}">
+                                {% if item.work_item_type == 'Bug' %}
+                                    !
+                                {% elif item.work_item_type == 'Task' %}
+                                    ✓
+                                {% elif item.work_item_type == 'Feature' %}
+                                    ✦
+                                {% else %}
+                                    ◈
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="item-title">{{ item.title }}</div>
+                                <div class="item-subtitle">
+                                    #{{ item.id }} · {{ item.work_item_type }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        {% if item.state == 'Done' %}
+                            <span class="badge success">● Done</span>
+                        {% elif item.state == 'Active' %}
+                            <span class="badge warning">● Active</span>
+                        {% else %}
+                            <span class="badge">● New</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="priority-cell">
+                        {% if configured %}
+                            <span class="score">{{ "%.1f"|format(item.priority_score) }}</span>
+                            <div class="progress">
+                                <div class="progress-bar" style="width:{{ item.priority_score }}%"></div>
+                            </div>
+                        {% else %}
+                            <span class="muted">Not configured</span>
+                        {% endif %}
+                    </td>
+
+                    <td><strong>{{ item.story_points }}</strong></td>
+
+                    <td>
+                        {% if item.blocked %}
+                            <span class="badge danger">Blocked</span>
+                            <div class="item-subtitle">{{ item.blocked_by|join(', ') }}</div>
+                        {% elif item.depends_on %}
+                            <span class="badge success">Unblocked</span>
+                        {% else %}
+                            <span class="muted">No dependency</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="actions">
+                            <a class="button secondary small"
+                               href="{{ url_for('edit_story', item_id=item.id) }}">Edit</a>
+                            <form method="POST"
+                                  action="{{ url_for('delete_story', item_id=item.id) }}"
+                                  onsubmit="return confirm('Delete this work item?')">
+                                <button type="submit" class="button danger small">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-illustration">▤</div>
+        <h2>Your product backlog starts here</h2>
+        <p class="muted" style="max-width:440px;margin:0 auto 20px">
+            Add your own stories, bugs, and tasks. BacklogVision will use
+            your configured scoring model to calculate priority.
+        </p>
+        <a href="{{ url_for('add_story') }}" class="button">＋ Create First Work Item</a>
+    </div>
+    {% endif %}
+</section>
+
+<section class="sprint-panel">
+    <div class="section-heading">
+        <div>
+            <h2>✦ Sprint Planning Studio</h2>
+            <p>Generate a capacity-aware plan from your current backlog.</p>
+        </div>
+        <span class="badge primary">Planning</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('sprint') }}" class="sprint-form">
+        <div class="field">
+            <label for="capacity">Team sprint capacity (story points)</label>
+            <input type="number" id="capacity" name="capacity"
+                   min="1" step="1" required placeholder="e.g. 30">
+        </div>
+        <button type="submit" class="button">Generate Sprint Plan →</button>
+    </form>
+
+    {% if sprint_result %}
+    <div class="sprint-results">
+        <div class="grid">
+            <div class="metric-card">
+                <div class="metric-top">Planned Points</div>
+                <div class="metric-value">{{ sprint_result.total_points }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-top">Remaining Capacity</div>
+                <div class="metric-value">{{ sprint_result.remaining_capacity }}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-top">Sprint Risk</div>
+                <div class="metric-value" style="font-size:24px">
+                    {{ sprint_risk.risk_level if sprint_risk else "—" }}
+                </div>
+                {% if sprint_risk %}
+                <div class="metric-note">
+                    Score {{ sprint_risk.risk_score }}/100
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <h3 style="margin-top:25px">Selected Work Items</h3>
+        {% if sprint_result.stories %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Work Item</th>
+                        <th>Priority</th>
+                        <th>Story Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sprint_result.stories %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>{{ "%.1f"|format(item.priority_score) }}</td>
+                        <td>{{ item.story_points }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="muted">No work items could be selected within this capacity.</p>
+        {% endif %}
+
+        {% if sprint_risk %}
+        <h3 style="margin-top:22px">Risk Explanation</h3>
+        <ul>
+            {% for reason in sprint_risk.reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+        <p class="muted">
+            Capacity utilization: {{ sprint_risk.utilization_percent }}%
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

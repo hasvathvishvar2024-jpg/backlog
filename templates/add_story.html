@@ -1,0 +1,670 @@
+
+{% extends "base.html" %}
+
+{% block title %}Add Work Item | BacklogVision{% endblock %}
+{% block header_title %}Create Work Item{% endblock %}
+
+{% block content %}
+
+<style>
+    .form-hero {
+        padding: 26px 30px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        color: white;
+        background: linear-gradient(115deg, #27205f, #5148d7 65%, #8275ff);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-hero:after {
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: -95px;
+        width: 220px;
+        height: 220px;
+        border: 1px solid #ffffff35;
+        border-radius: 50%;
+        box-shadow: 0 0 0 24px #ffffff0c, 0 0 0 48px #ffffff08;
+    }
+
+    .form-hero h1 {
+        color: white;
+        font-size: 26px;
+        margin: 0 0 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-hero p {
+        color: #e4e0ff;
+        font-size: 13px;
+        max-width: 570px;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 285px;
+        align-items: start;
+        gap: 22px;
+    }
+
+    .form-main {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    .form-section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 17px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+    }
+
+    .form-section-heading {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-bottom: 23px;
+    }
+
+    .section-icon {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        flex-shrink: 0;
+        font-size: 19px;
+        color: #5d53e9;
+        background: #efeeff;
+    }
+
+    .form-section-heading h2 {
+        font-size: 16px;
+        margin: 1px 0 5px;
+    }
+
+    .form-section-heading p {
+        color: var(--muted);
+        font-size: 12px;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .form-grid .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-section label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #39425c;
+        margin-bottom: 8px;
+    }
+
+    .required-star {
+        color: #dc5264;
+    }
+
+    .form-section input:not([type="checkbox"]),
+    .form-section select,
+    .form-section textarea {
+        width: 100%;
+        border: 1px solid #dfe3ef;
+        background: #fbfcff;
+        color: #252d46;
+        border-radius: 10px;
+        padding: 12px 13px;
+        font: inherit;
+        font-size: 13px;
+        box-sizing: border-box;
+        transition: border-color .18s, box-shadow .18s;
+    }
+
+    .form-section input:focus,
+    .form-section select:focus,
+    .form-section textarea:focus {
+        outline: none;
+        border-color: #8178ff;
+        box-shadow: 0 0 0 3px #8178ff20;
+        background: white;
+    }
+
+    .form-section textarea {
+        resize: vertical;
+        min-height: 110px;
+        line-height: 1.6;
+    }
+
+    .field-help {
+        color: #8991a6;
+        font-size: 11px;
+        margin-top: 7px;
+        line-height: 1.5;
+    }
+
+    .rating-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .rating-card {
+        padding: 15px;
+        border: 1px solid #e5e7f2;
+        background: #fcfcff;
+        border-radius: 13px;
+    }
+
+    .rating-card label {
+        margin-bottom: 8px;
+    }
+
+    .rating-card input {
+        margin-top: 2px;
+    }
+
+    .rating-card .field-help {
+        min-height: 30px;
+    }
+
+    .dependency-list {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        max-height: 260px;
+        overflow-y: auto;
+        padding-right: 3px;
+    }
+
+    .dependency-option {
+        display: flex !important;
+        align-items: flex-start;
+        gap: 11px;
+        border: 1px solid #e5e7f2;
+        border-radius: 12px;
+        padding: 13px;
+        cursor: pointer;
+        margin: 0 !important;
+        background: #fcfcff;
+        transition: border-color .15s, background .15s;
+    }
+
+    .dependency-option:hover {
+        border-color: #b9b4ff;
+        background: #f8f7ff;
+    }
+
+    .dependency-option input[type="checkbox"] {
+        margin-top: 3px;
+        accent-color: #5d53e9;
+        flex-shrink: 0;
+    }
+
+    .dependency-option strong {
+        display: block;
+        color: #303954;
+        font-size: 12px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+    .dependency-option small {
+        display: block;
+        color: #858da3;
+        font-size: 11px;
+        margin-top: 4px;
+        font-weight: 400;
+    }
+
+    .no-dependencies {
+        padding: 20px;
+        border: 1px dashed #d7d9e9;
+        background: #fafaff;
+        border-radius: 12px;
+        color: #7c849b;
+        font-size: 12px;
+        line-height: 1.7;
+        text-align: center;
+    }
+
+    .form-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        min-width: 0;
+    }
+
+    .side-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+    }
+
+    .side-card h3 {
+        font-size: 14px;
+        margin: 0 0 14px;
+    }
+
+    .step-row {
+        display: flex;
+        gap: 11px;
+        align-items: flex-start;
+        margin: 17px 0;
+    }
+
+    .step-number {
+        display: grid;
+        place-items: center;
+        width: 27px;
+        height: 27px;
+        flex-shrink: 0;
+        border-radius: 9px;
+        background: #efeeff;
+        color: #5d53e9;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .step-row strong {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .step-row p {
+        font-size: 11px;
+        line-height: 1.6;
+        color: #858da3;
+        margin: 0;
+    }
+
+    .rating-guide {
+        border-radius: 12px;
+        padding: 14px;
+        background: #f8f7ff;
+        margin-top: 13px;
+    }
+
+    .rating-guide div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+        font-size: 11px;
+        color: #59627a;
+    }
+
+    .rating-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .form-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding-top: 5px;
+    }
+
+    .form-bottom p {
+        font-size: 11px;
+        color: #858da3;
+        margin: 0;
+    }
+
+    .form-bottom-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 1000px) {
+        .form-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .form-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .form-hero {
+            padding: 22px;
+        }
+
+        .form-hero h1 {
+            font-size: 22px;
+        }
+
+        .form-section {
+            padding: 18px;
+        }
+
+        .form-grid,
+        .rating-grid,
+        .form-sidebar {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="form-hero">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:#d3ceff;margin-bottom:10px">
+        BACKLOG MANAGEMENT / NEW ITEM
+    </div>
+    <h1>Create a new work item</h1>
+    <p>
+        Capture the work, assess its business importance, and define
+        prerequisites so your team can plan a more reliable sprint.
+    </p>
+</div>
+
+<form method="POST" action="{{ url_for('add_story') }}">
+    <div class="form-layout">
+
+        <div class="form-main">
+
+            <!-- Basic information -->
+            <section class="form-section">
+                <div class="form-section-heading">
+                    <div class="section-icon">✎</div>
+                    <div>
+                        <h2>Work Item Details</h2>
+                        <p>Start with a clear title and a useful description.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label for="title">Work item title <span class="required-star">*</span></label>
+                        <input type="text" id="title" name="title"
+                               maxlength="200" required
+                               value="{{ request.form.get('title', '') }}"
+                               placeholder="e.g. Add secure user login">
+                        <div class="field-help">Use a short, specific title that describes the work.</div>
+                    </div>
+
+                    <div class="full-width">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"
+                                  placeholder="Describe the requirement, expected outcome, and acceptance criteria...">{{ request.form.get('description', '') }}</textarea>
+                        <div class="field-help">Explain what needs to be done and how the team can recognize completion.</div>
+                    </div>
+
+                    <div>
+                        <label for="work_item_type">Work item type <span class="required-star">*</span></label>
+                        <select id="work_item_type" name="work_item_type" required>
+                            {% for option in ['User Story', 'Bug', 'Task', 'Feature'] %}
+                            <option value="{{ option }}"
+                                {% if request.form.get('work_item_type', 'User Story') == option %}selected{% endif %}>
+                                {{ option }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="state">Status <span class="required-star">*</span></label>
+                        <select id="state" name="state" required>
+                            {% for option in ['New', 'Active', 'Done'] %}
+                            <option value="{{ option }}"
+                                {% if request.form.get('state', 'New') == option %}selected{% endif %}>
+                                {{ option }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Priority criteria -->
+            <section class="form-section">
+                <div class="form-section-heading">
+                    <div class="section-icon">◎</div>
+                    <div>
+                        <h2>Priority Assessment</h2>
+                        <p>Rate each criterion from 1 to 10. Higher values mean greater importance.</p>
+                    </div>
+                </div>
+
+                <div class="rating-grid">
+                    <div class="rating-card">
+                        <label for="business_value">Business Value <span class="required-star">*</span></label>
+                        <input type="number" id="business_value" name="business_value"
+                               min="1" max="10" step="1" required
+                               value="{{ request.form.get('business_value', '') }}"
+                               placeholder="1–10">
+                        <div class="field-help">How much business benefit will this deliver?</div>
+                    </div>
+
+                    <div class="rating-card">
+                        <label for="urgency">Urgency <span class="required-star">*</span></label>
+                        <input type="number" id="urgency" name="urgency"
+                               min="1" max="10" step="1" required
+                               value="{{ request.form.get('urgency', '') }}"
+                               placeholder="1–10">
+                        <div class="field-help">How soon does this need attention?</div>
+                    </div>
+
+                    <div class="rating-card">
+                        <label for="customer_impact">Customer Impact <span class="required-star">*</span></label>
+                        <input type="number" id="customer_impact" name="customer_impact"
+                               min="1" max="10" step="1" required
+                               value="{{ request.form.get('customer_impact', '') }}"
+                               placeholder="1–10">
+                        <div class="field-help">How significantly will customers benefit?</div>
+                    </div>
+
+                    <div class="rating-card">
+                        <label for="risk_reduction">Risk Reduction <span class="required-star">*</span></label>
+                        <input type="number" id="risk_reduction" name="risk_reduction"
+                               min="1" max="10" step="1" required
+                               value="{{ request.form.get('risk_reduction', '') }}"
+                               placeholder="1–10">
+                        <div class="field-help">How much risk or uncertainty will it reduce?</div>
+                    </div>
+
+                    <div class="rating-card">
+                        <label for="strategic_alignment">Strategic Alignment <span class="required-star">*</span></label>
+                        <input type="number" id="strategic_alignment" name="strategic_alignment"
+                               min="1" max="10" step="1" required
+                               value="{{ request.form.get('strategic_alignment', '') }}"
+                               placeholder="1–10">
+                        <div class="field-help">How well does it support strategic goals?</div>
+                    </div>
+                </div>
+
+                <div class="rating-guide">
+                    <strong style="font-size:12px">Rating guide</strong>
+                    <div>
+                        <span class="rating-dot" style="background:#dc5264"></span>
+                        <span><strong>1–3:</strong> Low importance</span>
+                    </div>
+                    <div>
+                        <span class="rating-dot" style="background:#e9a23b"></span>
+                        <span><strong>4–7:</strong> Moderate importance</span>
+                    </div>
+                    <div>
+                        <span class="rating-dot" style="background:#159b72"></span>
+                        <span><strong>8–10:</strong> High importance</span>
+                    </div>
+                    <p class="field-help" style="margin-bottom:0">
+                        Final priority scores depend on the weights configured in Priority Settings.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Estimation -->
+            <section class="form-section">
+                <div class="form-section-heading">
+                    <div class="section-icon">◷</div>
+                    <div>
+                        <h2>Effort & Estimation</h2>
+                        <p>Estimate the work so sprint capacity can be planned.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div>
+                        <label for="effort">Effort <span class="required-star">*</span></label>
+                        <input type="number" id="effort" name="effort"
+                               min="1" step="1" required
+                               value="{{ request.form.get('effort', '') }}"
+                               placeholder="e.g. 5">
+                        <div class="field-help">Enter a positive whole number using your team's effort scale.</div>
+                    </div>
+
+                    <div>
+                        <label for="story_points">Story Points <span class="required-star">*</span></label>
+                        <input type="number" id="story_points" name="story_points"
+                               min="1" step="1" required
+                               value="{{ request.form.get('story_points', '') }}"
+                               placeholder="e.g. 3">
+                        <div class="field-help">Used to check whether the sprint fits team capacity.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dependencies -->
+            <section class="form-section">
+                <div class="form-section-heading">
+                    <div class="section-icon">⌘</div>
+                    <div>
+                        <h2>Dependencies</h2>
+                        <p>Select any existing work items that must be completed first.</p>
+                    </div>
+                </div>
+
+                {% if items %}
+                <div class="dependency-list">
+                    {% for item in items %}
+                    <label class="dependency-option">
+                        <input type="checkbox" name="depends_on"
+                               value="{{ item.id }}"
+                               {% if item.id|string in request.form.getlist('depends_on') %}checked{% endif %}>
+                        <span>
+                            <strong>{{ item.title }}</strong>
+                            <small>
+                                #{{ item.id }} · {{ item.work_item_type }} · {{ item.state }}
+                                {% if item.state != 'Done' %} · Not yet completed{% endif %}
+                            </small>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="field-help">
+                    A selected prerequisite that is not marked Done will cause this item to be considered blocked.
+                    Circular dependencies are not allowed.
+                </div>
+                {% else %}
+                <div class="no-dependencies">
+                    <div style="font-size:24px;margin-bottom:8px">⌁</div>
+                    <strong>No existing work items</strong>
+                    <p style="margin:6px 0 0">
+                        You can create this item without prerequisites. Add other items later
+                        and link them through the edit screen.
+                    </p>
+                </div>
+                {% endif %}
+            </section>
+
+            <div class="form-bottom">
+                <p><span class="required-star">*</span> Required fields</p>
+                <div class="form-bottom-actions">
+                    <a href="{{ url_for('index') }}" class="button secondary">Cancel</a>
+                    <button type="submit" class="button">Create Work Item →</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar guidance -->
+        <aside class="form-sidebar">
+            <section class="side-card">
+                <h3>Creation Checklist</h3>
+
+                <div class="step-row">
+                    <div class="step-number">01</div>
+                    <div>
+                        <strong>Describe the work</strong>
+                        <p>Choose a meaningful title and explain the intended outcome.</p>
+                    </div>
+                </div>
+
+                <div class="step-row">
+                    <div class="step-number">02</div>
+                    <div>
+                        <strong>Assess importance</strong>
+                        <p>Rate all five criteria consistently from 1 to 10.</p>
+                    </div>
+                </div>
+
+                <div class="step-row">
+                    <div class="step-number">03</div>
+                    <div>
+                        <strong>Estimate effort</strong>
+                        <p>Enter positive whole numbers for effort and story points.</p>
+                    </div>
+                </div>
+
+                <div class="step-row">
+                    <div class="step-number">04</div>
+                    <div>
+                        <strong>Check dependencies</strong>
+                        <p>Choose prerequisites that genuinely need to be completed first.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="side-card">
+                <h3>How priority works</h3>
+                <p class="muted" style="font-size:12px;line-height:1.8;margin:0">
+                    BacklogVision combines your five ratings with the weights
+                    defined in Priority Settings to calculate a normalized score
+                    between 0 and 100.
+                </p>
+                <div style="margin-top:15px">
+                    <a href="{{ url_for('settings') }}" class="button secondary" style="width:100%">
+                        Configure Weights →
+                    </a>
+                </div>
+            </section>
+
+            <section class="side-card" style="background:#f8f7ff;border-color:#dedbff">
+                <h3>Planning Tip ✦</h3>
+                <p style="font-size:12px;line-height:1.8;color:#646b86;margin:0">
+                    High-priority work is not automatically ready for a sprint.
+                    Resolve prerequisites and make sure the selected work fits
+                    your team's available story-point capacity.
+                </p>
+            </section>
+        </aside>
+
+    </div>
+</form>
+
+{% endblock %}

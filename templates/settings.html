@@ -1,0 +1,689 @@
+
+{% extends "base.html" %}
+
+{% block title %}Priority Settings | BacklogVision{% endblock %}
+{% block header_title %}Priority Settings{% endblock %}
+
+{% block content %}
+
+<style>
+    .settings-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 28px 30px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        color: white;
+        background: linear-gradient(115deg, #27205f, #5148d7 65%, #8275ff);
+    }
+
+    .settings-hero:after {
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: -95px;
+        width: 220px;
+        height: 220px;
+        border: 1px solid #ffffff35;
+        border-radius: 50%;
+        box-shadow: 0 0 0 24px #ffffff0c, 0 0 0 48px #ffffff08;
+    }
+
+    .settings-hero h1 {
+        position: relative;
+        z-index: 1;
+        color: white;
+        font-size: 27px;
+        margin: 0 0 9px;
+    }
+
+    .settings-hero p {
+        position: relative;
+        z-index: 1;
+        max-width: 590px;
+        color: #e4e0ff;
+        font-size: 13px;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    .settings-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 22px;
+        align-items: start;
+    }
+
+    .settings-main {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .settings-card, .settings-side-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 17px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+    }
+
+    .settings-card-heading {
+        display: flex;
+        gap: 13px;
+        align-items: flex-start;
+        margin-bottom: 22px;
+    }
+
+    .settings-icon {
+        display: grid;
+        place-items: center;
+        width: 43px;
+        height: 43px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: #efeeff;
+        color: #5d53e9;
+        font-size: 20px;
+    }
+
+    .settings-card-heading h2 {
+        font-size: 16px;
+        margin: 2px 0 5px;
+    }
+
+    .settings-card-heading p {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .weight-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .weight-card {
+        padding: 17px;
+        border: 1px solid #e5e7f2;
+        border-radius: 13px;
+        background: #fcfcff;
+        transition: border-color .15s, background .15s;
+    }
+
+    .weight-card:focus-within {
+        border-color: #b9b4ff;
+        background: #faf9ff;
+    }
+
+    .weight-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 13px;
+    }
+
+    .weight-name {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+    }
+
+    .weight-symbol {
+        width: 37px;
+        height: 37px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        border-radius: 11px;
+        background: #efeeff;
+        color: #5d53e9;
+        font-weight: 800;
+        font-size: 15px;
+    }
+
+    .weight-name strong {
+        display: block;
+        font-size: 13px;
+        color: #303954;
+    }
+
+    .weight-name small {
+        display: block;
+        font-size: 11px;
+        line-height: 1.5;
+        color: #858da3;
+        margin-top: 4px;
+    }
+
+    .weight-input-wrap {
+        width: 110px;
+        flex-shrink: 0;
+    }
+
+    .weight-input-wrap label {
+        display: block;
+        color: #7e879d;
+        font-size: 10px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .weight-input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px 11px;
+        border: 1px solid #dfe3ef;
+        border-radius: 9px;
+        background: white;
+        font-size: 14px;
+        font-weight: 750;
+        color: #303954;
+    }
+
+    .weight-input:focus {
+        outline: none;
+        border-color: #8178ff;
+        box-shadow: 0 0 0 3px #8178ff20;
+    }
+
+    .weight-track {
+        width: 100%;
+        height: 6px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #edeef6;
+    }
+
+    .weight-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #8178ff, #5d53e9);
+        transition: width .15s ease;
+    }
+
+    .weight-foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        color: #8b92a6;
+        font-size: 10px;
+        margin-top: 8px;
+    }
+
+    .weight-total-card {
+        padding: 21px;
+        border: 1px solid #dedbff;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #f5f3ff, #fbfaff);
+    }
+
+    .total-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .total-top span:first-child {
+        font-size: 12px;
+        font-weight: 750;
+        color: #4b5271;
+    }
+
+    .total-number {
+        color: #5148d7;
+        font-size: 30px;
+        font-weight: 850;
+        letter-spacing: -1px;
+    }
+
+    .total-track {
+        height: 9px;
+        border-radius: 20px;
+        background: #e6e3fa;
+        overflow: hidden;
+        margin-top: 15px;
+    }
+
+    .total-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: #5d53e9;
+        transition: width .15s ease;
+    }
+
+    .total-message {
+        margin: 12px 0 0;
+        font-size: 12px;
+        line-height: 1.7;
+        color: #626987;
+    }
+
+    .settings-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .settings-actions p {
+        margin: 0;
+        font-size: 11px;
+        color: #858da3;
+    }
+
+    .settings-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        min-width: 0;
+    }
+
+    .settings-side-card h3 {
+        margin: 0 0 15px;
+        font-size: 14px;
+    }
+
+    .criterion-info {
+        padding: 13px 0;
+        border-bottom: 1px solid #eef0f6;
+    }
+
+    .criterion-info:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .criterion-info strong {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 5px;
+        color: #303954;
+    }
+
+    .criterion-info p {
+        margin: 0;
+        color: #858da3;
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .formula-box {
+        border-radius: 12px;
+        padding: 15px;
+        background: #f8f7ff;
+        border: 1px solid #e2dfff;
+        color: #4f5574;
+        font-size: 12px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    .formula-box code {
+        display: block;
+        margin-top: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        color: #5148d7;
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    @media (max-width: 1000px) {
+        .settings-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .settings-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .settings-hero {
+            padding: 22px;
+        }
+
+        .settings-hero h1 {
+            font-size: 23px;
+        }
+
+        .settings-card, .settings-side-card {
+            padding: 18px;
+        }
+
+        .settings-sidebar {
+            grid-template-columns: 1fr;
+        }
+
+        .weight-card {
+            padding: 13px;
+        }
+
+        .weight-card-top {
+            align-items: flex-start;
+        }
+
+        .weight-name {
+            gap: 8px;
+        }
+
+        .weight-input-wrap {
+            width: 90px;
+        }
+    }
+</style>
+
+<div class="settings-hero">
+    <div style="position:relative;z-index:1;font-size:10px;font-weight:800;letter-spacing:2px;color:#d3ceff;margin-bottom:10px">
+        CONFIGURATION / SCORING MODEL
+    </div>
+    <h1>Priority Scoring Settings</h1>
+    <p>
+        Customize how BacklogVision evaluates work. Assign a percentage to each
+        criterion based on your team's business goals. All five weights must
+        add up to exactly 100%.
+    </p>
+</div>
+
+<div class="settings-layout">
+    <div class="settings-main">
+
+        <section class="settings-card">
+            <div class="settings-card-heading">
+                <div class="settings-icon">⚙</div>
+                <div>
+                    <h2>Scoring Criteria</h2>
+                    <p>
+                        Enter a weight from 0 to 100 for each criterion.
+                        Higher weights give that criterion greater influence on the final score.
+                    </p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('settings') }}" id="weights-form">
+
+                <div class="weight-cards">
+                    {% set criteria_info = {
+                        'business_value': {
+                            'label': 'Business Value',
+                            'description': 'Expected contribution to business outcomes.',
+                            'symbol': '↗'
+                        },
+                        'urgency': {
+                            'label': 'Urgency',
+                            'description': 'How time-sensitive the work is.',
+                            'symbol': '◷'
+                        },
+                        'customer_impact': {
+                            'label': 'Customer Impact',
+                            'description': 'Expected benefit to customers.',
+                            'symbol': '♡'
+                        },
+                        'risk_reduction': {
+                            'label': 'Risk Reduction',
+                            'description': 'Potential reduction in risk or uncertainty.',
+                            'symbol': '◇'
+                        },
+                        'strategic_alignment': {
+                            'label': 'Strategic Alignment',
+                            'description': "Fit with the organization's strategic goals.",
+                            'symbol': '◎'
+                        }
+                    } %}
+
+                    {% for criterion in criteria %}
+                    <div class="weight-card">
+                        <div class="weight-card-top">
+                            <div class="weight-name">
+                                <div class="weight-symbol">
+                                    {{ criteria_info[criterion].symbol }}
+                                </div>
+                                <div>
+                                    <strong>{{ labels[criterion] }}</strong>
+                                    <small>{{ criteria_info[criterion].description }}</small>
+                                </div>
+                            </div>
+
+                            <div class="weight-input-wrap">
+                                <label for="{{ criterion }}">WEIGHT (%)</label>
+                                <input
+                                    class="weight-input"
+                                    type="number"
+                                    id="{{ criterion }}"
+                                    name="{{ criterion }}"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    required
+                                    value="{{ weights.get(criterion, '') }}"
+                                    placeholder="0–100">
+                            </div>
+                        </div>
+
+                        <div class="weight-track">
+                            <div class="weight-fill" data-fill-for="{{ criterion }}"></div>
+                        </div>
+
+                        <div class="weight-foot">
+                            <span>Influence on priority</span>
+                            <span data-value-for="{{ criterion }}">
+                                {% if criterion in weights %}{{ weights[criterion] }}%{% else %}Not set{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="weight-total-card" style="margin-top:20px">
+                    <div class="total-top">
+                        <span>Total Assigned Weight</span>
+                        <span class="total-number"><span id="total-weight">0</span><span style="font-size:16px">%</span></span>
+                    </div>
+                    <div class="total-track">
+                        <div class="total-fill" id="total-fill"></div>
+                    </div>
+                    <p class="total-message" id="total-message" aria-live="polite">
+                        Enter all five weights. The total must equal 100%.
+                    </p>
+                </div>
+
+                <div class="settings-actions" style="margin-top:22px">
+                    <p>Weights must total 100%. Zero is allowed for a criterion.</p>
+                    <div class="actions">
+                        <a href="{{ url_for('index') }}" class="button secondary">Cancel</a>
+                        <button type="submit" class="button" id="save-weights">Save Scoring Model →</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section class="settings-card">
+            <div class="settings-card-heading" style="margin-bottom:12px">
+                <div class="settings-icon">ƒ</div>
+                <div>
+                    <h2>How the score is calculated</h2>
+                    <p>BacklogVision normalizes the weighted ratings to a 0–100 priority score.</p>
+                </div>
+            </div>
+
+            <div class="formula-box">
+                Each rating is multiplied by its configured weight. The weighted rating is then normalized.
+                <code>Score = ((Weighted Rating − 1) ÷ 9) × 100</code>
+                <p style="margin:10px 0 0">
+                    When the weights total 100%, a work item rated 1 across every criterion scores 0,
+                    while an item rated 10 across every criterion scores 100.
+                </p>
+            </div>
+        </section>
+
+    </div>
+
+    <aside class="settings-sidebar">
+
+        <section class="settings-side-card">
+            <h3>Criterion Guide</h3>
+
+            <div class="criterion-info">
+                <strong>↗ Business Value</strong>
+                <p>Revenue potential, operational efficiency, or measurable business benefit.</p>
+            </div>
+
+            <div class="criterion-info">
+                <strong>◷ Urgency</strong>
+                <p>Deadlines, time-sensitive needs, and consequences of delaying the work.</p>
+            </div>
+
+            <div class="criterion-info">
+                <strong>♡ Customer Impact</strong>
+                <p>Improvements to usability, satisfaction, accessibility, or customer outcomes.</p>
+            </div>
+
+            <div class="criterion-info">
+                <strong>◇ Risk Reduction</strong>
+                <p>Security, reliability, compliance, technical uncertainty, or other risk mitigation.</p>
+            </div>
+
+            <div class="criterion-info">
+                <strong>◎ Strategic Alignment</strong>
+                <p>Contribution to product direction and longer-term organizational goals.</p>
+            </div>
+        </section>
+
+        <section class="settings-side-card" style="background:#f8f7ff;border-color:#dedbff">
+            <h3>Configuration Tips ✦</h3>
+            <div style="font-size:12px;line-height:1.9;color:#626987">
+                <p>• Use higher weights for your most important business drivers.</p>
+                <p>• Keep the same rating scale across all backlog items.</p>
+                <p>• Review weights when business objectives change.</p>
+                <p style="margin-bottom:0">• Compare the resulting ranking with team judgment before finalizing a sprint.</p>
+            </div>
+        </section>
+
+        <section class="settings-side-card">
+            <h3>What happens next?</h3>
+            <p style="font-size:12px;line-height:1.8;color:#7e879d;margin:0 0 15px">
+                Once you save valid weights, the dashboard can calculate priority scores
+                for backlog items and use them during sprint planning.
+            </p>
+            <a href="{{ url_for('index') }}" class="button secondary" style="width:100%">
+                Back to Dashboard →
+            </a>
+        </section>
+
+    </aside>
+</div>
+
+<script>
+(function () {
+    const form = document.getElementById("weights-form");
+    if (!form) return;
+
+    const fields = Array.from(form.querySelectorAll(".weight-input"));
+    const totalDisplay = document.getElementById("total-weight");
+    const totalFill = document.getElementById("total-fill");
+    const totalMessage = document.getElementById("total-message");
+    const saveButton = document.getElementById("save-weights");
+
+    function updateTotal() {
+        let total = 0;
+        let allFilled = true;
+        let valid = true;
+
+        fields.forEach(function (field) {
+            const raw = field.value.trim();
+            const value = Number(raw);
+            const filled = raw !== "";
+
+            if (!filled) {
+                allFilled = false;
+            }
+
+            if (filled && (!Number.isFinite(value) || value < 0 || value > 100)) {
+                valid = false;
+            }
+
+            if (filled && Number.isFinite(value)) {
+                total += value;
+            }
+
+            const fill = form.querySelector('[data-fill-for="' + field.id + '"]');
+            const valueLabel = form.querySelector('[data-value-for="' + field.id + '"]');
+
+            if (fill) {
+                const safeValue = filled && Number.isFinite(value)
+                    ? Math.min(100, Math.max(0, value))
+                    : 0;
+                fill.style.width = safeValue + "%";
+            }
+
+            if (valueLabel) {
+                valueLabel.textContent = filled && Number.isFinite(value)
+                    ? value + "%"
+                    : "Not set";
+            }
+        });
+
+        total = Math.round(total * 10) / 10;
+        totalDisplay.textContent = total;
+        totalFill.style.width = Math.min(100, Math.max(0, total)) + "%";
+
+        const matches = Math.abs(total - 100) < 0.001;
+        const ready = allFilled && valid && matches;
+
+        if (!allFilled) {
+            totalMessage.textContent = "Complete all five fields. The total must equal 100%.";
+        } else if (!valid) {
+            totalMessage.textContent = "Each weight must be between 0 and 100.";
+        } else if (total < 100) {
+            totalMessage.textContent = "You have " + (100 - total).toFixed(1) + "% left to allocate.";
+        } else if (total > 100) {
+            totalMessage.textContent = "Weights exceed 100% by " + (total - 100).toFixed(1) + "%. Reduce some values.";
+        } else {
+            totalMessage.textContent = "Perfect — all weights total 100%. Your scoring model is ready to save.";
+        }
+
+        saveButton.disabled = !ready;
+        saveButton.style.opacity = ready ? "1" : "0.6";
+        saveButton.style.cursor = ready ? "pointer" : "not-allowed";
+    }
+
+    fields.forEach(function (field) {
+        field.addEventListener("input", updateTotal);
+    });
+
+    form.addEventListener("submit", function (event) {
+        const total = fields.reduce(function (sum, field) {
+            return sum + Number(field.value);
+        }, 0);
+
+        const allValid = fields.every(function (field) {
+            return field.value.trim() !== "" &&
+                Number.isFinite(Number(field.value)) &&
+                Number(field.value) >= 0 &&
+                Number(field.value) <= 100;
+        });
+
+        if (!allValid || Math.abs(total - 100) >= 0.001) {
+            event.preventDefault();
+            updateTotal();
+            totalMessage.textContent = "Please enter five valid weights that add up to exactly 100%.";
+        }
+    });
+
+    updateTotal();
+})();
+</script>
+
+{% endblock %}

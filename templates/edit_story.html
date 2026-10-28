@@ -1,0 +1,602 @@
+
+{% extends "base.html" %}
+
+{% block title %}Edit Work Item | BacklogVision{% endblock %}
+{% block header_title %}Edit Work Item{% endblock %}
+
+{% block content %}
+
+<style>
+    .edit-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 26px 30px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        color: white;
+        background: linear-gradient(115deg, #27205f, #5148d7 65%, #8275ff);
+    }
+
+    .edit-hero:after {
+        content: "";
+        position: absolute;
+        right: -35px;
+        top: -95px;
+        width: 220px;
+        height: 220px;
+        border: 1px solid #ffffff35;
+        border-radius: 50%;
+        box-shadow: 0 0 0 24px #ffffff0c, 0 0 0 48px #ffffff08;
+    }
+
+    .edit-hero h1 {
+        position: relative;
+        z-index: 1;
+        color: white;
+        font-size: 26px;
+        margin: 0 0 9px;
+        overflow-wrap: anywhere;
+    }
+
+    .edit-hero p {
+        position: relative;
+        z-index: 1;
+        color: #e4e0ff;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .edit-meta {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .edit-meta span {
+        padding: 6px 10px;
+        background: #ffffff18;
+        border: 1px solid #ffffff30;
+        border-radius: 8px;
+        font-size: 11px;
+    }
+
+    .edit-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 285px;
+        gap: 22px;
+        align-items: start;
+    }
+
+    .edit-main {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    .edit-section, .edit-side-card {
+        padding: 24px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 17px;
+        box-shadow: var(--shadow);
+    }
+
+    .edit-section-heading {
+        display: flex;
+        gap: 13px;
+        align-items: flex-start;
+        margin-bottom: 22px;
+    }
+
+    .edit-section-icon {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: #efeeff;
+        color: #5d53e9;
+        font-size: 19px;
+    }
+
+    .edit-section-heading h2 {
+        font-size: 16px;
+        margin: 1px 0 5px;
+    }
+
+    .edit-section-heading p {
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--muted);
+        margin: 0;
+    }
+
+    .edit-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .edit-grid .full {
+        grid-column: 1 / -1;
+    }
+
+    .edit-section label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #39425c;
+        margin-bottom: 8px;
+    }
+
+    .edit-section input:not([type="checkbox"]),
+    .edit-section select,
+    .edit-section textarea {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 12px 13px;
+        border: 1px solid #dfe3ef;
+        border-radius: 10px;
+        background: #fbfcff;
+        color: #252d46;
+        font: inherit;
+        font-size: 13px;
+        transition: border-color .18s, box-shadow .18s;
+    }
+
+    .edit-section input:focus,
+    .edit-section select:focus,
+    .edit-section textarea:focus {
+        outline: none;
+        border-color: #8178ff;
+        box-shadow: 0 0 0 3px #8178ff20;
+        background: white;
+    }
+
+    .edit-section textarea {
+        min-height: 110px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .edit-help {
+        color: #8991a6;
+        font-size: 11px;
+        line-height: 1.6;
+        margin-top: 7px;
+    }
+
+    .edit-rating-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .edit-rating-card {
+        padding: 15px;
+        background: #fcfcff;
+        border: 1px solid #e5e7f2;
+        border-radius: 13px;
+    }
+
+    .edit-rating-card label {
+        margin-bottom: 8px;
+    }
+
+    .edit-dependencies {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+    .edit-dependency {
+        display: flex !important;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 13px;
+        border: 1px solid #e5e7f2;
+        border-radius: 12px;
+        background: #fcfcff;
+        cursor: pointer;
+        margin: 0 !important;
+        transition: background .15s, border-color .15s;
+    }
+
+    .edit-dependency:hover {
+        background: #f8f7ff;
+        border-color: #b9b4ff;
+    }
+
+    .edit-dependency input[type="checkbox"] {
+        margin-top: 3px;
+        accent-color: #5d53e9;
+        flex-shrink: 0;
+    }
+
+    .edit-dependency strong {
+        display: block;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #303954;
+        overflow-wrap: anywhere;
+    }
+
+    .edit-dependency small {
+        display: block;
+        font-size: 11px;
+        color: #858da3;
+        margin-top: 4px;
+        font-weight: 400;
+    }
+
+    .edit-no-dependencies {
+        padding: 22px;
+        border: 1px dashed #d7d9e9;
+        border-radius: 12px;
+        background: #fafaff;
+        text-align: center;
+        color: #7c849b;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .edit-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        min-width: 0;
+    }
+
+    .edit-side-card h3 {
+        font-size: 14px;
+        margin: 0 0 15px;
+    }
+
+    .edit-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 0;
+        border-bottom: 1px solid #eef0f6;
+        font-size: 12px;
+    }
+
+    .edit-info-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .edit-info-row span {
+        color: #7e879d;
+    }
+
+    .edit-info-row strong {
+        color: #303954;
+        text-align: right;
+    }
+
+    .edit-tip {
+        padding: 15px;
+        background: #f8f7ff;
+        border: 1px solid #e2dfff;
+        border-radius: 12px;
+        color: #626987;
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .edit-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 4px;
+    }
+
+    .edit-actions p {
+        color: #858da3;
+        font-size: 11px;
+        margin: 0;
+    }
+
+    .edit-actions-right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    @media (max-width: 1000px) {
+        .edit-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .edit-sidebar {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 560px) {
+        .edit-hero {
+            padding: 22px;
+        }
+
+        .edit-hero h1 {
+            font-size: 22px;
+        }
+
+        .edit-section, .edit-side-card {
+            padding: 18px;
+        }
+
+        .edit-grid, .edit-rating-grid, .edit-sidebar {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="edit-hero">
+    <div style="font-size:10px;font-weight:800;letter-spacing:2px;color:#d3ceff;margin-bottom:10px">
+        BACKLOG MANAGEMENT / EDIT ITEM
+    </div>
+    <h1>{{ item.title }}</h1>
+    <p>Update the item's details, scoring criteria, estimation, and dependencies.</p>
+    <div class="edit-meta">
+        <span>Work item #{{ item.id }}</span>
+        <span>{{ item.work_item_type }}</span>
+        <span>{{ item.state }}</span>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('edit_story', item_id=item.id) }}">
+    <div class="edit-layout">
+
+        <div class="edit-main">
+
+            <section class="edit-section">
+                <div class="edit-section-heading">
+                    <div class="edit-section-icon">✎</div>
+                    <div>
+                        <h2>Work Item Details</h2>
+                        <p>Maintain a clear description and the current delivery status.</p>
+                    </div>
+                </div>
+
+                <div class="edit-grid">
+                    <div class="full">
+                        <label for="title">Work item title *</label>
+                        <input type="text" id="title" name="title"
+                               maxlength="200" required value="{{ item.title }}">
+                    </div>
+
+                    <div class="full">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"
+                        >{{ item.description }}</textarea>
+                    </div>
+
+                    <div>
+                        <label for="work_item_type">Work item type *</label>
+                        <select id="work_item_type" name="work_item_type" required>
+                            {% for option in ['User Story', 'Bug', 'Task', 'Feature'] %}
+                            <option value="{{ option }}"
+                                {% if item.work_item_type == option %}selected{% endif %}>
+                                {{ option }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="state">Status *</label>
+                        <select id="state" name="state" required>
+                            {% for option in ['New', 'Active', 'Done'] %}
+                            <option value="{{ option }}"
+                                {% if item.state == option %}selected{% endif %}>
+                                {{ option }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="edit-section">
+                <div class="edit-section-heading">
+                    <div class="edit-section-icon">◎</div>
+                    <div>
+                        <h2>Priority Assessment</h2>
+                        <p>Adjust the five ratings to reflect current business needs.</p>
+                    </div>
+                </div>
+
+                <div class="edit-rating-grid">
+                    <div class="edit-rating-card">
+                        <label for="business_value">Business Value *</label>
+                        <input type="number" id="business_value" name="business_value"
+                               min="1" max="10" step="1" required
+                               value="{{ item.business_value }}">
+                        <div class="edit-help">Expected business benefit.</div>
+                    </div>
+
+                    <div class="edit-rating-card">
+                        <label for="urgency">Urgency *</label>
+                        <input type="number" id="urgency" name="urgency"
+                               min="1" max="10" step="1" required
+                               value="{{ item.urgency }}">
+                        <div class="edit-help">How soon the work is needed.</div>
+                    </div>
+
+                    <div class="edit-rating-card">
+                        <label for="customer_impact">Customer Impact *</label>
+                        <input type="number" id="customer_impact" name="customer_impact"
+                               min="1" max="10" step="1" required
+                               value="{{ item.customer_impact }}">
+                        <div class="edit-help">Effect on customer experience.</div>
+                    </div>
+
+                    <div class="edit-rating-card">
+                        <label for="risk_reduction">Risk Reduction *</label>
+                        <input type="number" id="risk_reduction" name="risk_reduction"
+                               min="1" max="10" step="1" required
+                               value="{{ item.risk_reduction }}">
+                        <div class="edit-help">Potential reduction in risk.</div>
+                    </div>
+
+                    <div class="edit-rating-card">
+                        <label for="strategic_alignment">Strategic Alignment *</label>
+                        <input type="number" id="strategic_alignment" name="strategic_alignment"
+                               min="1" max="10" step="1" required
+                               value="{{ item.strategic_alignment }}">
+                        <div class="edit-help">Alignment with strategic goals.</div>
+                    </div>
+                </div>
+
+                <div class="edit-tip" style="margin-top:16px">
+                    <strong>Scoring note:</strong> The priority score is calculated from these ratings
+                    and the configured criterion weights. Ratings must be whole numbers between 1 and 10.
+                </div>
+            </section>
+
+            <section class="edit-section">
+                <div class="edit-section-heading">
+                    <div class="edit-section-icon">◷</div>
+                    <div>
+                        <h2>Effort & Estimation</h2>
+                        <p>Update estimates used by the sprint planner.</p>
+                    </div>
+                </div>
+
+                <div class="edit-grid">
+                    <div>
+                        <label for="effort">Effort *</label>
+                        <input type="number" id="effort" name="effort"
+                               min="1" step="1" required value="{{ item.effort }}">
+                        <div class="edit-help">Positive whole number on your team's effort scale.</div>
+                    </div>
+
+                    <div>
+                        <label for="story_points">Story Points *</label>
+                        <input type="number" id="story_points" name="story_points"
+                               min="1" step="1" required value="{{ item.story_points }}">
+                        <div class="edit-help">Used in sprint capacity calculations.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="edit-section">
+                <div class="edit-section-heading">
+                    <div class="edit-section-icon">⌘</div>
+                    <div>
+                        <h2>Work Dependencies</h2>
+                        <p>Select the items that must be completed before this item can proceed.</p>
+                    </div>
+                </div>
+
+                {% if items %}
+                <div class="edit-dependencies">
+                    {% for candidate in items %}
+                    <label class="edit-dependency">
+                        <input type="checkbox" name="depends_on"
+                               value="{{ candidate.id }}"
+                               {% if candidate.id in selected_dependencies %}checked{% endif %}>
+                        <span>
+                            <strong>{{ candidate.title }}</strong>
+                            <small>
+                                #{{ candidate.id }} · {{ candidate.work_item_type }} · {{ candidate.state }}
+                                {% if candidate.state != 'Done' %} · Not yet completed{% endif %}
+                            </small>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="edit-help">
+                    Items marked Done do not block this item. The system should reject circular
+                    dependencies when you save your changes.
+                </div>
+                {% else %}
+                <div class="edit-no-dependencies">
+                    <div style="font-size:24px;margin-bottom:8px">⌁</div>
+                    <strong>No other work items available</strong>
+                    <p style="margin:6px 0 0">This item currently has no selectable prerequisites.</p>
+                </div>
+                {% endif %}
+            </section>
+
+            <div class="edit-actions">
+                <p>* Required fields</p>
+                <div class="edit-actions-right">
+                    <a href="{{ url_for('index') }}" class="button secondary">Cancel</a>
+                    <button type="submit" class="button">Save Changes →</button>
+                </div>
+            </div>
+
+        </div>
+
+        <aside class="edit-sidebar">
+            <section class="edit-side-card">
+                <h3>Item Snapshot</h3>
+
+                <div class="edit-info-row">
+                    <span>Item ID</span>
+                    <strong>#{{ item.id }}</strong>
+                </div>
+
+                <div class="edit-info-row">
+                    <span>Type</span>
+                    <strong>{{ item.work_item_type }}</strong>
+                </div>
+
+                <div class="edit-info-row">
+                    <span>Current status</span>
+                    <strong>{{ item.state }}</strong>
+                </div>
+
+                <div class="edit-info-row">
+                    <span>Story points</span>
+                    <strong>{{ item.story_points }}</strong>
+                </div>
+
+                <div class="edit-info-row">
+                    <span>Prerequisites</span>
+                    <strong>{{ selected_dependencies|length }}</strong>
+                </div>
+            </section>
+
+            <section class="edit-side-card">
+                <h3>Before You Save</h3>
+
+                <div style="font-size:12px;line-height:1.8;color:#68718a">
+                    <p>✓ Review the item title and description.</p>
+                    <p>✓ Check all five priority ratings.</p>
+                    <p>✓ Update story points if the estimate has changed.</p>
+                    <p style="margin-bottom:0">✓ Ensure dependencies reflect the actual delivery order.</p>
+                </div>
+            </section>
+
+            <section class="edit-side-card" style="background:#f8f7ff;border-color:#dedbff">
+                <h3>Priority Settings</h3>
+                <p style="font-size:12px;line-height:1.8;color:#626987;margin:0 0 15px">
+                    The same ratings can produce different scores when the criterion weights change.
+                </p>
+                <a href="{{ url_for('settings') }}" class="button secondary" style="width:100%">
+                    Review Weights →
+                </a>
+            </section>
+        </aside>
+
+    </div>
+</form>
+
+{% endblock %}
